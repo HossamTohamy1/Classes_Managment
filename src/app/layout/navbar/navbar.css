@@ -1,0 +1,47 @@
+/* navbar.css */
+.page-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.menu-toggle-btn {
+  margin-right: 16px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.toolbar-btn {
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* Animation for icon change */
+.menu-toggle-btn mat-icon {
+  transition: transform 0.2s ease;
+}
+
+.menu-toggle-btn:active mat-icon {
+  transform: rotate(180deg);
+}

@@ -1,0 +1,419 @@
+<mat-sidenav-container class="sidenav-container">
+    <mat-sidenav-content class="main-content">
+        <div class="timetable-container" [@fadeIn]>
+
+            <div class="page-header">
+                <h1>
+                    <mat-icon>schedule</mat-icon>
+                    إدارة الجدول الزمني
+                </h1>
+                <div class="header-actions">
+                    <mat-form-field style="margin-top: 9%;" appearance="outline" class="class-selector">
+                        <mat-label>اختر الفصل</mat-label>
+                        <mat-select [(value)]="selectedClass" (selectionChange)="onClassChange($event)">
+                            <mat-option *ngFor="let class of classes; trackBy: trackByClass"
+                                [value]="getClassDisplayName(class)">
+                                {{ getClassDisplayName(class) }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+
+                </div>
+            </div>
+
+            <div *ngIf="isLoading && classes.length === 0" class="loading-container">
+                <mat-spinner></mat-spinner>
+                <p>جاري تحميل البيانات...</p>
+            </div>
+
+            <div class="stats-section" [@slideIn] *ngIf="!isLoading || classes.length > 0">
+                <mat-card class="stat-card">
+                    <mat-card-header>
+                        <mat-icon>class</mat-icon>
+                        <mat-card-title>{{ selectedClass || 'لم يتم اختيار فصل' }}</mat-card-title>
+                        <mat-card-subtitle>الفصل الحالي</mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>
+
+                <mat-card class="stat-card">
+                    <mat-card-header>
+                        <mat-icon>schedule</mat-icon>
+                        <mat-card-title>{{ getTotalScheduledHours() }}</mat-card-title>
+                        <mat-card-subtitle>الساعات المجدولة</mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>
+
+                <mat-card class="stat-card">
+                    <mat-card-header>
+                        <mat-icon [class.error-icon]="hasConflicts">{{ hasConflicts ? 'error' : 'check_circle'
+                            }}</mat-icon>
+                        <mat-card-title>{{ hasConflicts ? 'يوجد تعارضات' : 'لا توجد تعارضات' }}</mat-card-title>
+                        <mat-card-subtitle>حالة الجدول</mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>
+
+                <mat-card class="stat-card">
+                    <mat-card-header>
+                        <mat-icon>subject</mat-icon>
+                        <mat-card-title>{{ subjects.length }}</mat-card-title>
+                        <mat-card-subtitle>المواد المتاحة</mat-card-subtitle>
+                    </mat-card-header>
+                </mat-card>
+            </div>
+
+
+
+
+            <mat-card class="table-card" [@slideIn] *ngIf="!isLoading || classes.length > 0">
+                <mat-card-header>
+                    <mat-card-title>
+                        <mat-icon>subject</mat-icon>
+                        المواد المتاحة
+                        <span *ngIf="selectedClassId" class="subtitle">
+                            لـ {{ selectedClass }}
+                        </span>
+                    </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <div *ngIf="!selectedClassId" class="info-message">
+                        <mat-icon>info</mat-icon>
+                        <p>يرجى اختيار فصل لرؤية المواد المتاحة</p>
+                    </div>
+
+                    <div *ngIf="selectedClassId && !hasSubjectsLoaded(selectedClassId)" class="loading-container">
+                        <mat-spinner diameter="30"></mat-spinner>
+                        <p>جاري تحميل المواد...</p>
+                    </div>
+
+                    <div *ngIf="selectedClassId && hasSubjectsLoaded(selectedClassId) && subjects.length === 0"
+                        class="info-message">
+                        <mat-icon>info</mat-icon>
+                        <p>لا توجد مواد مخصصة لهذا الفصل</p>
+                    </div>
+
+                    <div *ngIf="selectedClassId && hasSubjectsLoaded(selectedClassId) && subjects.length > 0"
+                        class="subjects-grid">
+                        <div *ngFor="let subject of subjects; trackBy: trackBySubject" class="draggable-subject"
+                            [class.unassigned-teacher]="!subject.isAssigned"
+                            [ngStyle]="{ 'background-color': subject.color }" draggable="true"
+                            [attr.data-subject-id]="subject.id" [attr.data-teacher-id]="subject.teacherId"
+                            (dragstart)="onDragStart(subject, $event)" (dragend)="onDragEnd()">
+                            <div class="subject-info">
+                                <span class="subject-name" style="font-size:large ;">{{translateSubject(subject.name)
+                                    }}</span>
+                                <span class="teacher-name" [class.no-teacher]="!subject.isAssigned"
+                                    style="font-size: large;">
+                                    {{ subject.teacher }}
+                                </span>
+                                <small *ngIf="subject.hoursPerWeek" class="hours-info">
+                                    {{ subject.hoursPerWeek }} ساعة/أسبوع
+                                </small>
+                                <mat-icon *ngIf="!subject.isAssigned" class="warning-icon"
+                                    matTooltip="لا يوجد معلم مخصص">
+                                    warning
+                                </mat-icon>
+                            </div>
+                            <mat-icon class="drag-handle">drag_indicator</mat-icon>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+
+            <mat-card class="table-card" [@slideIn] *ngIf="!isLoading || classes.length > 0">
+                <mat-card-header class="card-header-flex">
+                    <mat-card-title>
+                        <mat-icon>calendar_view_week</mat-icon>
+                        الجدول الأسبوعي - {{ selectedClass || 'لم يتم اختيار فصل' }}
+                    </mat-card-title>
+
+                    <div class="header-buttons">
+                        <button mat-raised-button color="primary" (click)="generateRandomTimetable()"
+                            [disabled]="!selectedClassId || isLoading" class="add-class-btn">
+                            <mat-icon>refresh</mat-icon>
+                            إنشاء عشوائي
+                        </button>
+
+
+
+
+
+                    </div>
+                </mat-card-header>
+                <mat-card-content>
+                    <div *ngIf="isLoading && !isDrawerOpen" class="loading-container">
+                        <mat-spinner></mat-spinner>
+                        <p>جاري معالجة الجدول...</p>
+                    </div>
+
+                    <div *ngIf="!selectedClassId" class="empty-state">
+                        <mat-icon>class</mat-icon>
+                        <h3>لم يتم اختيار فصل</h3>
+                        <p>يرجى اختيار فصل لعرض أو إنشاء جدول</p>
+                    </div>
+
+                    <div *ngIf="selectedClassId && !hasSubjects(selectedClassId)" class="empty-state">
+                        <mat-icon>subject</mat-icon>
+                        <h3>لا توجد مواد محددة</h3>
+                        <p>هذا الفصل ليس لديه أي مواد محددة. يرجى إضافة المواد أولاً.</p>
+                    </div>
+
+                    <div *ngIf="selectedClassId && hasSubjects(selectedClassId) && !isLoading" class="table-container">
+                        <div *ngIf="hasConflicts" class="conflicts-warning">
+                            <mat-icon>warning</mat-icon>
+                            <span>هذا الجدول يحتوي على {{ conflicts.length }} تعارض(ات). يرجى المراجعة والحل.</span>
+                        </div>
+
+                        <div class="timetable-grid">
+                            <div class="timetable-header">
+                                <div class="time-column-header">الوقت</div>
+                                <div *ngFor="let day of weekDays" class="day-header">
+                                    {{ day.label }}
+                                </div>
+
+                            </div>
+
+                            <div *ngFor="let timeSlot of timeSlots; trackBy: trackByPeriod" class="timetable-row"
+                                [@slideIn]>
+
+                                <div class="time-column">
+                                    <div class="period-number">{{ timeSlot.period }}</div>
+                                    <div class="period-time">{{ formatPeriodTime(timeSlot.period) }}</div>
+                                </div>
+
+                                <div *ngFor="let day of weekDays" class="timetable-cell"
+                                    [class.has-conflict]="timeSlot.slots?.[day.key] ? isSlotInConflict(timeSlot.slots[day.key]!) : false"
+                                    (dragover)="onDragOver($event)"
+                                    (drop)="onDrop($event, selectedClassId!, currentTimetable!.id, timeSlot.period, day.key)">
+
+                                    <div *ngIf="!timeSlot.slots[day.key]" class="empty-slot"
+                                        [ngStyle]="getSubjectStyle(null)">
+                                        <span class="empty-text">أسقط المادة هنا</span>
+                                    </div>
+                                    <div *ngIf="timeSlot.slots[day.key]" class="filled-slot parent-item"
+                                        [ngStyle]="getSubjectStyle(timeSlot.slots[day.key]!)"
+                                        [matTooltip]="getSlotTooltip(timeSlot.slots[day.key]!)" draggable="true"
+                                        (dragstart)="onSlotDragStart(timeSlot.slots[day.key]!, $event, timeSlot.period, day.key)">
+
+                                        <div class="slot-content">
+                                            <div class="subject-name" dir="rtl" style="font-size:large ;">
+                                                {{ timeSlot.slots[day.key]?.subjectName }}
+                                            </div>
+                                            <div class="teacher-name" style="font-size:large ;">
+                                                {{ timeSlot.slots[day.key]?.teacherName }}
+                                            </div>
+                                            <button mat-icon-button color="warn" class="remove-slot-btn delete-btn"
+                                                (click)="onRemoveSlot(timeSlot.period, day.key); $event.stopPropagation()"
+                                                matTooltip="إزالة الحصة">
+                                                <mat-icon class="test">close</mat-icon>
+                                            </button>
+
+                                            <mat-icon
+                                                *ngIf="timeSlot.slots[day.key] && isSlotInConflict(timeSlot.slots[day.key]!)"
+                                                class="conflict-icon" color="warn"
+                                                [matTooltip]="getConflictTooltip(timeSlot.slots[day.key]!)">
+                                                warning
+                                            </mat-icon>
+
+                                            <mat-icon
+                                                *ngIf="timeSlot.slots[day.key] && hasRestrictedPeriodConflict(timeSlot.slots[day.key]!)"
+                                                class="restricted-icon" color="accent"
+                                                matTooltip="المعلم لديه فترة مقيدة">
+                                                schedule
+                                            </mat-icon>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="getTotalScheduledHours() === 0" class="empty-state">
+                            <mat-icon>schedule_outlined</mat-icon>
+                            <h3>لا يوجد جدول بعد</h3>
+                            <p>ابدأ بسحب المواد إلى الجدول أو إنشاء جدول تلقائي</p>
+                            <div class="empty-state-actions">
+                                <button mat-raised-button color="primary" (click)="generateRandomTimetable()"
+                                    [disabled]="isLoading">
+                                    <mat-icon>refresh</mat-icon>
+                                    إنشاء جدول عشوائي
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+
+
+
+        </div>
+    </mat-sidenav-content>
+
+    <mat-sidenav #drawer mode="over" position="end" [opened]="isDrawerOpen" (closed)="closeDrawer()"
+        class="class-drawer" [@slideInFromRight]>
+
+        <div class="drawer-header">
+            <h2>
+                <mat-icon>tune</mat-icon>
+                إعدادات الجدولة
+            </h2>
+            <button mat-icon-button (click)="closeDrawer()" class="close-btn">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="drawer-content">
+            <form [formGroup]="constraintsForm">
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <mat-icon>rule</mat-icon>
+                        قواعد الجدولة
+                    </h3>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>القيود النشطة</mat-label>
+                            <mat-select multiple [(value)]="selectedConstraints"
+                                (selectionChange)="onConstraintSelectionChange()">
+                                <mat-option *ngFor="let option of constraintOptions" [value]="option.value">
+                                    <div class="constraint-option">
+                                        <span class="constraint-label">{{option.label}}</span>
+                                        <small class="constraint-desc">{{option.description}}</small>
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="selected-constraints" *ngIf="selectedConstraints.length > 0">
+                        <div class="subjects-list">
+                            <div *ngFor="let constraint of selectedConstraints" class="subject-item">
+                                <span>{{getConstraintLabel(constraint)}}</span>
+                                <button type="button" mat-icon-button color="warn"
+                                    (click)="removeConstraint(constraint)" matTooltip="إزالة القيد">
+                                    <mat-icon>remove_circle</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="constraints-checkboxes">
+                        <mat-checkbox formControlName="avoidDoubleBooking">
+                            تجنب الحجز المزدوج
+                        </mat-checkbox>
+                        <mat-checkbox formControlName="spreadSubjectsEvenly">
+                            توزيع المواد بالتساوي
+                        </mat-checkbox>
+                        <mat-checkbox formControlName="respectRestrictedPeriods">
+                            احترام الفترات المقيدة
+                        </mat-checkbox>
+                        <mat-checkbox formControlName="balanceWorkload">
+                            موازنة عبء العمل
+                        </mat-checkbox>
+                        <mat-checkbox formControlName="allowConsecutiveClasses">
+                            السماح بالحصص المتتالية
+                        </mat-checkbox>
+                    </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <mat-icon>settings</mat-icon>
+                        إعدادات الفصل
+                    </h3>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>الفصل المستهدف</mat-label>
+                            <mat-select [(value)]="selectedClass" (selectionChange)="onClassChange($event)">
+                                <mat-option *ngFor="let class of classes; trackBy: trackByClass"
+                                    [value]="getClassDisplayName(class)">
+                                    {{ getClassDisplayName(class) }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>أقصى عدد حصص يومياً</mat-label>
+                            <input matInput type="number" formControlName="maxPeriodsPerDay" min="1" max="10">
+                            <mat-hint>1-10 حصص يومياً</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>أقصى عدد ساعات يومياً</mat-label>
+                            <input matInput type="number" [(ngModel)]="maxHoursPerDay" name="maxHours" min="1" max="8"
+                                placeholder="6">
+                            <mat-hint>1-8 ساعات يومياً</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="selectedClassId" class="class-info">
+                        <h4>معلومات الفصل</h4>
+                        <p><strong>إجمالي الساعات:</strong> {{ getTotalHoursForClass(selectedClassId) }}</p>
+                        <p><strong>المواد:</strong> {{ getAvailableSubjectsForClass(selectedClassId).length }}</p>
+                    </div>
+                </div>
+
+                <div class="drawer-actions">
+                    <button type="button" mat-stroked-button (click)="closeDrawer()" [disabled]="isLoading"
+                        class="full-width">
+                        <mat-icon>clear</mat-icon>
+                        إلغاء
+                    </button>
+
+
+                </div>
+            </form>
+        </div>
+    </mat-sidenav>
+
+    <ng-template #conflictDetailsDialog>
+        <div class="conflict-dialog">
+            <h2 mat-dialog-title>
+                <mat-icon color="warn">warning</mat-icon>
+                تفاصيل تعارض المعلم
+            </h2>
+
+            <mat-dialog-content>
+                <div class="conflict-summary">
+                    <p><strong>المعلم:</strong> {{ conflictDialogData?.teacherName }}</p>
+                    <p><strong>الوقت:</strong> {{ getDayOfWeekName(conflictDialogData?.DayOfWeek) }} الحصة {{
+                        conflictDialogData?.period }}</p>
+                    <p><strong>الفصل الحالي:</strong> {{ selectedClass }}</p>
+                    <p><strong>الفصل المتعارض:</strong> {{ conflictDialogData?.conflictingClassName }}</p>
+                    <p><strong>المادة:</strong> {{ conflictDialogData?.conflictingSubjectName }}</p>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="suggested-actions">
+                    <h3>الإجراءات المقترحة:</h3>
+                    <ul>
+                        <li>اختر وقتاً مختلفاً</li>
+                        <li>عيّن معلماً مختلفاً</li>
+                        <li>انقل الفصل المتعارض إلى حصة أخرى</li>
+                    </ul>
+                </div>
+            </mat-dialog-content>
+
+            <mat-dialog-actions align="end">
+                <button mat-button mat-dialog-close>إغلاق</button>
+                <button mat-raised-button color="primary" (click)="findAlternativeForConflict()">
+                    إيجاد بديل
+                </button>
+            </mat-dialog-actions>
+        </div>
+    </ng-template>
+</mat-sidenav-container>

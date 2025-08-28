@@ -1,0 +1,529 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- المحتوى الرئيسي -->
+  <mat-sidenav-content class="main-content">
+    <div class="classes-container" [@fadeIn]>
+      <!-- الرأس مع زر الإضافة -->
+      <div class="page-header">
+        <h1>
+          <mat-icon>school</mat-icon>
+          إدارة الفصول
+        </h1>
+        <div class="header-actions">
+          <button mat-raised-button color="primary" (click)="openAddClassDrawer()" class="add-class-btn"
+            [disabled]="isLoading">
+            <mat-icon>add</mat-icon>
+            إضافة فصل جديد
+          </button>
+        </div>
+      </div>
+
+      <!-- بطاقات الإحصائيات -->
+      <div class="stats-section" [@slideIn]>
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-icon>class</mat-icon>
+            <mat-card-title>{{ stats.totalClasses }}</mat-card-title>
+            <mat-card-subtitle>إجمالي الفصول</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-icon>book</mat-icon>
+            <mat-card-title>{{ stats.totalSubjects }}</mat-card-title>
+            <mat-card-subtitle>المواد المختلفة</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-icon>schedule</mat-icon>
+            <mat-card-title>{{ stats.averageHours }}</mat-card-title>
+            <mat-card-subtitle>متوسط الساعات/فصل</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-card-header>
+            <mat-icon>group</mat-icon>
+            <mat-card-title>{{ stats.totalTeachers }}</mat-card-title>
+            <mat-card-subtitle>المعلمين المتاحين</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+      </div>
+
+      <!-- جدول الفصول -->
+      <mat-card class="table-card" [@slideIn]>
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>list</mat-icon>
+            قائمة الفصول
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- حالة التحميل -->
+          <div *ngIf="isLoading && !hasError" class="loading-container">
+            <mat-spinner diameter="50"></mat-spinner>
+            <p>جاري تحميل الفصول...</p>
+            <small>يرجى الانتظار...</small>
+            <pre style="background:#f9f9f9; padding:5px;">DEBUG: isLoading=true, hasError=false</pre>
+          </div>
+
+          <!-- حالة الخطأ -->
+          <div *ngIf="hasError && !isLoading" class="error-state">
+            <mat-icon color="warn" style="font-size: 48px; width: 48px; height: 48px;">error_outline</mat-icon>
+            <h3>خطأ في تحميل البيانات</h3>
+            <p>{{ errorMessage }}</p>
+            <button mat-raised-button color="primary" (click)="refreshCurrentPage()">
+              <mat-icon>refresh</mat-icon>
+              إعادة المحاولة
+            </button>
+          </div>
+
+          <!-- جدول البيانات -->
+          <div *ngIf="!isLoading && !hasError" class="table-container">
+            <table mat-table [dataSource]="(classes$ | async) ?? []" class="classes-table">
+              <!-- تعريف الأعمدة -->
+              <ng-container matColumnDef="grade">
+                <th mat-header-cell *matHeaderCellDef>الصف</th>
+                <td mat-cell *matCellDef="let cls">
+                  <div class="grade-badge">
+                    <mat-icon>school</mat-icon>
+                    الصف {{ cls.grade }}
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="section">
+                <th mat-header-cell *matHeaderCellDef>الشعبة</th>
+                <td mat-cell *matCellDef="let cls">
+                  <mat-chip class="section-chip">{{ cls.section }}</mat-chip>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="subjects">
+                <th mat-header-cell *matHeaderCellDef>المواد</th>
+                <td mat-cell *matCellDef="let cls">
+                  <div class="subjects-display" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                    <!-- عرض أول مادتين -->
+                    <div *ngFor="let subject of getDisplayedSubjects(cls.subjects, 2)" class="subject-chip"
+                      style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #e3f2fd; color: #1976d2; border-radius: 16px; font-size: 14px; font-weight: 500;">
+                      <mat-icon style="font-size: 16px; width: 16px; height: 16px;">book</mat-icon>
+                      <span matTooltip="{{ subject.name + ' (' + subject.hoursPerWeek + ' حصه/أسبوع)' }}">
+                        {{ translateSubject(subject.name) }}
+                      </span>
+                    </div>
+
+                    <!-- زر "المزيد" إذا كان هناك مواد أكثر -->
+                    <button *ngIf="getRemainingSubjectsCount(cls.subjects, 2) > 0" 
+                            mat-button color="primary"
+                            class="more-subjects-btn" 
+                            (click)="openSubjectsDialog(cls)" 
+                            matTooltip="عرض جميع المواد"
+                            style="display: flex; align-items: center; gap: 4px; padding: 0 8px; min-width: auto !important; height: 24px; line-height: 1; border-radius: 12px; background: #1976d22f; color: #1000f5c0;">
+                      <mat-icon style="font-size: 16px;">subject</mat-icon>
+                      +{{ getRemainingSubjectsCount(cls.subjects, 2) }} أكثر
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="teacherNames">
+                <th mat-header-cell *matHeaderCellDef>المعلمين</th>
+                <td mat-cell *matCellDef="let cls">
+                  <div class="teachers-display" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; ">
+                    <ng-container *ngIf="cls.teacherNames?.length > 0; else noTeachers">
+                      <!-- عرض أول معلمين -->
+                      <div *ngFor="let teacher of getDisplayedTeachers(cls.teacherNames, 2)" class="teacher-chip " style = "font-size: 17px;">
+                        <mat-icon>person</mat-icon>
+                        {{ teacher }}
+                      </div>
+
+                      <!-- زر "المزيد" إذا كان هناك معلمين أكثر -->
+                      <button *ngIf="getRemainingTeachersCount(cls.teacherNames, 2) > 0" 
+                              mat-button color="accent" 
+                              class="more-teachers-btn" 
+                              (click)="openTeachersDialog(cls)"
+                              matTooltip="عرض جميع المعلمين"
+                              style="display: flex; align-items: center; gap: 4px; padding: 0 8px; font-size: 13px; color: rgba(0, 128, 0, 0.986); background: #e8f5e8; border-radius: 12px; min-width: auto !important; height: 24px; line-height: 1;">
+                        <mat-icon style="font-size: 16px;">group</mat-icon>
+                        +{{ getRemainingTeachersCount(cls.teacherNames, 2) }} أكثر
+                      </button>
+                    </ng-container>
+
+                    <ng-template #noTeachers>
+                      <span class="no-teacher">غير موجود</span>
+                    </ng-template>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="totalHours">
+                <th mat-header-cell *matHeaderCellDef>إجمالي الساعات</th>
+                <td mat-cell *matCellDef="let cls">
+                  <mat-icon matBadge="{{ cls.totalHours }}" matBadgeColor="primary"
+                    matTooltip="{{ cls.totalHours }} ساعة في الأسبوع">
+                    access_time
+                  </mat-icon>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">الإجراءات</th>
+                <td mat-cell *matCellDef="let cls" class="action-cell">
+                  
+                  <!-- زر عرض التفاصيل -->
+                  <button class="action-btn details-btn" 
+                          mat-icon-button 
+                          color="accent" 
+                          (click)="openDetailsDrawer(cls)"
+                          matTooltip="عرض التفاصيل">
+                    <mat-icon fontIcon="visibility"></mat-icon>
+                  </button>
+
+                  <!-- زر تعديل -->
+                  <button class="action-btn edit-btn" 
+                          mat-icon-button 
+                          color="primary" 
+                          (click)="openEditClassDrawer(cls)"
+                          matTooltip="تعديل الفصل">
+                    <mat-icon fontIcon="edit"></mat-icon>
+                  </button>
+
+                  <!-- زر حذف -->
+                  <button class="action-btn delete-btn" 
+                          mat-icon-button 
+                          color="warn" 
+                          (click)="deleteClass(cls.id!)"
+                          matTooltip="حذف الفصل">
+                    <mat-icon fontIcon="delete"></mat-icon>
+                  </button>
+                  
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" [@slideIn]></tr>
+            </table>
+
+            <mat-paginator
+              class="custom-paginator"
+              [length]="totalCount"
+              [pageSize]="pageSize"
+              [pageIndex]="currentPage - 1"
+              [pageSizeOptions]="[5, 10, 25, 50, 100]"
+              [showFirstLastButtons]="true"
+              (page)="onPageChange($event)">
+            </mat-paginator>
+
+            <!-- حالة فارغة -->
+            <div *ngIf="(classes$ | async)?.length === 0" class="empty-state">
+              <mat-icon>school_outlined</mat-icon>
+              <h3>لا توجد فصول بعد</h3>
+              <p>ابدأ بإضافة فصلك الأول</p>
+              <button mat-raised-button color="primary" (click)="openAddClassDrawer()">
+                <mat-icon>add</mat-icon>
+                إضافة الفصل الأول
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </mat-sidenav-content>
+
+  <!-- درج النموذج/التفاصيل للفصل -->
+  <mat-sidenav #drawer mode="over" position="end" [opened]="isDrawerOpen" (closed)="closeDrawer()" class="class-drawer"
+    [@slideInFromRight]>
+
+    <div class="drawer-header">
+      <h2>
+        <mat-icon>{{ drawerMode === 'details' ? 'visibility' : (drawerMode === 'edit' ? 'edit' : 'add') }}</mat-icon>
+        {{ drawerMode === 'details' ? 'تفاصيل الفصل' : (drawerMode === 'edit' ? 'تعديل الفصل' : 'إضافة فصل جديد') }}
+      </h2>
+      <button mat-icon-button (click)="closeDrawer()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="drawer-content">
+
+      <!-- وضع التفاصيل -->
+      <div *ngIf="drawerMode === 'details' && selectedClass" class="details-content">
+
+        <!-- قسم رأس الفصل -->
+        <div class="class-header">
+          <div class="class-avatar">
+            <mat-icon class="large-icon">class</mat-icon>
+          </div>
+          <div class="class-info">
+            <h1>الصف {{ selectedClass.grade }} - {{ selectedClass.section }}</h1>
+            <p class="grade-section-tag">
+              <mat-icon>school</mat-icon>
+              {{ selectedClass.subjects.length }} مواد • {{ selectedClass.totalHours }} حصه/أسبوع
+            </p>
+          </div>
+        </div>
+
+        <!-- قسم الإحصائيات السريعة -->
+        <div class="quick-stats">
+          <div class="stat-item">
+            <mat-icon>book</mat-icon>
+            <span class="stat-number">{{ selectedClass.subjects.length }}</span>
+            <span class="stat-label">مواد</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>schedule</mat-icon>
+            <span class="stat-number">{{ selectedClass.totalHours }}</span>
+            <span class="stat-label">ساعة/أسبوع</span>
+          </div>
+          <div class="stat-item">
+            <mat-icon>group</mat-icon>
+            <span class="stat-number">{{ selectedClass?.teacherNames?.length || 0 }}</span>
+            <span class="stat-label">معلمين</span>
+          </div>
+        </div>
+
+        <!-- قسم معلومات الفصل -->
+        <div class="detail-section">
+          <mat-card>
+            <mat-card-header>
+              <mat-icon>info</mat-icon>
+              <mat-card-title>معلومات الفصل</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="class-details-info">
+                <div class="detail-info-item">
+                  <span class="label">الصف:</span>
+                  <span class="value">{{ selectedClass.grade }}</span>
+                </div>
+                <div class="detail-info-item">
+                  <span class="label">الشعبة:</span>
+                  <span class="value">{{ selectedClass.section }}</span>
+                </div>
+                <div class="detail-info-item">
+                  <span class="label">إجمالي الساعات:</span>
+                  <span class="value">{{ selectedClass.totalHours }} حصه/أسبوع</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- قسم المواد -->
+        <div class="detail-section">
+          <mat-card>
+            <mat-card-header>
+              <mat-icon>book</mat-icon>
+              <mat-card-title>المواد ({{ selectedClass.subjects.length }})</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="subjects-details-grid">
+                <mat-card *ngFor="let subject of selectedClass.subjects" class="subject-detail-card">
+                  <mat-card-content>
+                    <div class="subject-detail-header">
+                      <h4>{{ subject.name }}</h4>
+                      <mat-chip class="hours-chip">{{ subject.hoursPerWeek }} حصه/أسبوع</mat-chip>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- قسم المعلمين -->
+        <div class="detail-section">
+          <mat-card>
+            <mat-card-header>
+              <mat-icon>group</mat-icon>
+              <mat-card-title>المعلمين</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="teachers-details">
+                <ng-container *ngIf="selectedClass?.teacherNames?.length; else noTeachersDetails">
+                  <mat-chip-listbox>
+                    <mat-chip-option *ngFor="let teacher of selectedClass?.teacherNames">
+                      <mat-icon>person</mat-icon>
+                      {{ teacher }}
+                    </mat-chip-option>
+                  </mat-chip-listbox>
+                </ng-container>
+
+                <ng-template #noTeachersDetails>
+                  <div class="empty-state-details">
+                    <mat-icon>person_off</mat-icon>
+                    <p>لا يوجد معلمين مخصصين</p>
+                    <small>سيتم تخصيص المعلمين أثناء إعداد الجدول</small>
+                  </div>
+                </ng-template>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+      </div>
+
+      <div *ngIf="drawerMode === 'add' || drawerMode === 'edit'">
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="form-section">
+            <h3 class="section-title">
+              <mat-icon>info</mat-icon>
+              المعلومات الأساسية
+            </h3>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>الصف</mat-label>
+                <mat-select formControlName="grade">
+                  <mat-option *ngFor="let grade of grades" [value]="grade">{{ grade }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('grade')">{{ getFormError('grade') }}</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>الشعبة</mat-label>
+                <mat-select formControlName="section">
+                  <mat-option *ngFor="let section of sections" [value]="section">الشعبة {{ section }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="isFieldInvalid('section')">{{ getFormError('section') }}</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <div class="form-section">
+            <div class="subjects-header">
+              <h3 class="section-title">
+                <mat-icon>book</mat-icon>
+                المواد والساعات
+              </h3>
+              <button type="button" mat-mini-fab color="primary" (click)="addSubject()" matTooltip="إضافة مادة"
+                [disabled]="isLoading">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <div class="subjects-list" formArrayName="subjects">
+              <div *ngFor="let subject of subjects.controls; let i = index" [formGroupName]="i" class="subject-item">
+                <div class="subject-fields">
+                  <mat-form-field appearance="outline" class="subject-name-field">
+                    <mat-label>اسم المادة</mat-label>
+                    <mat-select formControlName="name">
+                      <mat-option *ngFor="let subjectName of availableSubjects" [value]="subjectName">
+                        {{  translateSubject(subjectName)  }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="isFieldInvalid('name', i)">{{ getFormError('name', i) }}</mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="hours-field">
+                    <mat-label>ساعات/أسبوع</mat-label>
+                    <input matInput type="number" formControlName="hoursPerWeek" min="1" max="10" placeholder="1">
+                    <mat-hint>1-10 ساعات</mat-hint>
+                    <mat-error *ngIf="isFieldInvalid('hoursPerWeek', i)">{{ getFormError('hoursPerWeek', i)
+                      }}</mat-error>
+                  </mat-form-field>
+
+                  <button type="button" mat-icon-button color="warn" (click)="removeSubject(i)"
+                    [disabled]="subjects.length === 1" matTooltip="حذف المادة">
+                    <mat-icon>remove_circle</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="total-hours" *ngIf="getTotalHours() > 0">
+              <mat-chip class="total-hours-chip">
+                <mat-icon>schedule</mat-icon>
+                الإجمالي: {{ getTotalHours() }} حصه/أسبوع
+              </mat-chip>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="drawer-actions">
+      <div *ngIf="drawerMode === 'details'">
+        <div class="action-row">
+          <button mat-raised-button color="primary" (click)="switchToEditMode()" class="half-width">
+            <mat-icon>edit</mat-icon>
+            تعديل الفصل
+          </button>
+          <button mat-stroked-button (click)="closeDrawer()" class="half-width">
+            <mat-icon>close</mat-icon>
+            إغلاق
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="drawerMode === 'add' || drawerMode === 'edit'">
+        <button type="button" mat-stroked-button (click)="closeDrawer()" [disabled]="isLoading" class="full-width">
+          <mat-icon>clear</mat-icon>
+          إلغاء
+        </button>
+
+        <button type="button" mat-raised-button color="primary" (click)="onSubmit()"
+          [disabled]="isLoading || form.invalid || subjects.length === 0" class="full-width">
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          <mat-icon *ngIf="!isLoading">{{ drawerMode === 'edit' ? 'save' : 'add' }}</mat-icon>
+          {{ drawerMode === 'edit' ? 'تحديث الفصل' : 'إضافة فصل' }}
+        </button>
+      </div>
+    </div>
+
+  </mat-sidenav>
+</mat-sidenav-container>
+
+<style>
+.teachers-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.teacher-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #e8f5e8;
+  color: #2e7d32;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.teacher-chip mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.more-teachers-btn {
+  min-width: auto !important;
+  height: 24px;
+  line-height: 1;
+  border-radius: 12px;
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.more-teachers-btn:hover {
+  background: #e1bee7;
+}
+
+.no-teacher {
+  color: #999;
+  font-style: italic;
+  font-size: 12px;
+}
+</style>

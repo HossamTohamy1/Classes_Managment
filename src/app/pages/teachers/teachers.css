@@ -1,0 +1,1002 @@
+/* teachers.component.css */
+
+/* Main Container Styles */
+.sidenav-container {
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.main-content {
+  padding: 0;
+}
+
+.teachers-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.page-header h1 mat-icon {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+  color: #1976d2;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.add-teacher-btn {
+  min-width: 160px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Statistics Section */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.stat-card mat-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.stat-card mat-icon {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+  margin-bottom: 8px;
+  color: #1976d2;
+}
+
+/* Table Styles */
+.table-card {
+  margin-bottom: 24px;
+}
+
+.table-card mat-card-header {
+  margin-bottom: 16px;
+}
+
+.table-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.teachers-table {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.teacher-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #1976d2;
+}
+
+.subject-chip {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.subject-chip mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Classes Display in Table */
+.classes-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  max-width: 300px;
+}
+
+.class-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border-radius: 16px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.class-chip mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.more-classes-btn {
+  min-width: auto !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 13px !important;
+  border-radius: 14px !important;
+  background-color: rgba(0, 128, 0, 0.103);
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+}
+
+.more-classes-btn mat-icon {
+  font-size: 14px !important;
+  height: 14px !important;
+  width: 14px !important;
+  margin-right: 2px;
+}
+
+/* Periods Display in Table */
+.periods-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  max-width: 300px;
+}
+
+.period-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-radius: 16px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.period-chip mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.more-periods-btn {
+  min-width: auto !important;
+  height: 28px !important;
+  line-height: 28px !important;
+  padding: 0 8px !important;
+  font-size: 12px !important;
+  border-radius: 14px !important;
+  background-color: #ffcccb;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+}
+
+.more-periods-btn mat-icon {
+  font-size: 14px !important;
+  height: 14px !important;
+  width: 14px !important;
+  margin-right: 2px;
+}
+
+.no-classes, .no-restrictions {
+  color: #666;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.loading-container mat-spinner {
+  margin-bottom: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #666;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin: 16px 0 8px 0;
+  color: #333;
+}
+
+.empty-state p {
+  margin: 0 0 24px 0;
+  color: #666;
+}
+
+/* Drawer Styles */
+.teacher-drawer {
+  width: 520px;
+  background-color: white;
+  box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background-color: #1976d2;
+  color: white;
+}
+
+.drawer-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.drawer-header mat-icon {
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+}
+
+.close-btn {
+  color: white !important;
+}
+
+.drawer-content {
+  padding: 24px;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* Details Mode Styles */
+.details-content {
+  padding-bottom: 20px;
+}
+
+/* Teacher header section */
+.teacher-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin: -24px -24px 20px -24px;
+  border-radius: 0;
+}
+
+.teacher-avatar {
+  margin-right: 16px;
+}
+
+.large-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.teacher-info h1 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.subject-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.subject-tag mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Quick stats section */
+.quick-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.stat-item mat-icon {
+  display: block;
+  margin: 0 auto 8px;
+  font-size: 24px;
+  color: #666;
+}
+
+.stat-number {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Detail sections */
+.detail-section {
+  margin-bottom: 16px;
+}
+
+.detail-section mat-card-header {
+  padding-bottom: 8px;
+}
+
+.detail-section mat-card-header mat-icon {
+  margin-right: 8px;
+  color: #666;
+}
+
+.detail-section:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+/* Teacher information grid */
+.teacher-details-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-info-item:last-child {
+  border-bottom: none;
+}
+
+.detail-info-item .label {
+  font-weight: 500;
+  color: #666;
+}
+
+.detail-info-item .value {
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detail-info-item .value mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Classes grid */
+.classes-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.class-detail-card {
+  background-color: #f8f9fa;
+  border-left: 4px solid #2e7d32;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.class-detail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.class-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.class-detail-header h4 {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.class-chip {
+  background-color: #2e7d32;
+  color: white;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Periods section */
+.periods-details mat-chip-listbox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.periods-details mat-chip-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.periods-details mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Empty states */
+.empty-state-details {
+  text-align: center;
+  padding: 32px 16px;
+  color: #666;
+}
+
+.empty-state-details mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-details p {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.empty-state-details small {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.section-title mat-icon {
+  color: #1976d2;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: calc(50% - 6px);
+}
+
+/* Classes Section */
+.classes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Periods Section in Form */
+.periods-section {
+  margin: 24px 0;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.periods-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.periods-section h3 mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #1976d2;
+}
+
+.periods-hint {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.periods-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.day-group {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: white;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.day-header h4 {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.select-all-day {
+  min-width: 70px;
+  height: 32px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.select-all-day.selected {
+  background-color: #1976d2;
+  color: white;
+}
+
+.select-all-day.partial {
+  background-color: #ffeb3b;
+  color: #333;
+}
+
+.select-all-day mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.periods-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.periods-row .period-chip {
+  height: 32px;
+  border-radius: 16px;
+  font-size: 12px;
+  min-width: 0;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.periods-row .period-chip.selected {
+  background-color: #1976d2;
+  color: white;
+  border-color: #1976d2;
+}
+
+.periods-row .period-chip:hover {
+  background-color: #e3f2fd;
+}
+
+.periods-row .period-chip.selected:hover {
+  background-color: #1565c0;
+}
+
+/* Selected Summary */
+.selected-summary {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #e8f5e8;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+}
+
+.selected-summary h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px 0;
+  color: #2e7d32;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.selected-summary mat-chip-listbox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Drawer Actions */
+.drawer-actions {
+  position: relative;
+  bottom: auto;
+  right: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  margin-top: auto;
+  background-color: white;
+  border-top: 1px solid #eee;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+.teacher-drawer .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.teacher-drawer .drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 0;
+}
+
+.drawer-actions .full-width {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.drawer-actions .full-width:last-child {
+  margin-bottom: 0;
+}
+
+.drawer-actions button {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+}
+
+.half-width {
+  flex: 1;
+}
+
+/* Error State */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #f44336;
+}
+
+.error-state mat-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  margin-bottom: 16px;
+  color: #f44336;
+}
+
+.error-state h3 {
+  margin: 16px 0 8px 0;
+  color: #333;
+}
+
+.error-state p {
+  margin: 0 0 24px 0;
+  color: #666;
+}
+
+/* Action buttons styling */
+.details-btn mat-icon { color: #1976d2; }
+.edit-btn mat-icon { color: #ff9800; }
+.delete-btn mat-icon { color: #f44336; }
+
+/* Pagination */
+::ng-deep .mat-paginator {
+  font-size: 16px !important;
+  font-weight: 500;
+}
+
+::ng-deep .mat-paginator .mat-button-base {
+  font-size: 15px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .teacher-drawer {
+    width: 100vw;
+  }
+  
+  .teachers-container {
+    padding: 12px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .add-teacher-btn {
+    width: 100%;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr;
+  }
+
+  .drawer-content {
+    padding: 16px;
+  }
+
+  .drawer-actions {
+    width: 100%;
+    padding: 16px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .half-width {
+    width: 100%;
+  }
+
+  .periods-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .teacher-header {
+    flex-direction: column;
+    text-align: center;
+    margin: -16px -16px 20px -16px;
+  }
+
+  .teacher-avatar {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+
+  .quick-stats {
+    flex-direction: column;
+  }
+
+  .classes-display, .periods-display {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .page-header h1 mat-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+  }
+
+  .drawer-header {
+    padding: 16px 20px;
+  }
+
+  .drawer-header h2 {
+    font-size: 18px;
+  }
+
+  .class-chip, .period-chip {
+    font-size: 11px;
+  }
+
+  .more-classes-btn, .more-periods-btn {
+    font-size: 10px !important;
+    height: 24px !important;
+    line-height: 24px !important;
+  }
+}
+
+/* Animation Enhancements */
+.teachers-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.class-chip, .period-chip {
+  transition: transform 0.2s ease;
+}
+
+.class-chip:hover, .period-chip:hover {
+  transform: scale(1.05);
+}
+
+.more-classes-btn, .more-periods-btn {
+  transition: all 0.2s ease;
+}
+
+.more-classes-btn:hover {
+  background-color: #f57c00;
+  color: white;
+  transform: scale(1.05);
+}
+
+.more-periods-btn:hover {
+  background-color: #d32f2f;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Custom Material Theme Overrides */
+.mat-mdc-form-field {
+  margin-bottom: 8px;
+}
+
+.mat-mdc-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.mat-mdc-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* Drawer Specific Overrides */
+.teacher-drawer .mat-mdc-form-field {
+  margin-bottom: 16px;
+}
+
+.teacher-drawer .form-section {
+  margin: 20px 0;
+}
+
+/* Custom Scrollbar */
+.drawer-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.drawer-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

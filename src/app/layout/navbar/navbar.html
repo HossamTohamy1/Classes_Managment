@@ -1,0 +1,21 @@
+<!-- navbar.html -->
+<mat-toolbar color="primary" class="page-navbar">
+  <!-- زرار فتح/إغلاق الـ sidebar -->
+  <button mat-icon-button (click)="toggleSidebar()" class="menu-toggle-btn">
+    <mat-icon>{{ isSidebarOpen() ? 'menu_open' : 'menu' }}</mat-icon>
+  </button>
+  
+  <span class="page-title">{{ pageTitle }}</span>
+  <div class="toolbar-spacer"></div>
+  
+  <!-- أزرار أخرى -->
+  <button mat-icon-button class="toolbar-btn">
+    <mat-icon>search</mat-icon>
+  </button>
+  <button mat-icon-button class="toolbar-btn">
+    <mat-icon>notifications</mat-icon>
+  </button>
+  <button mat-icon-button class="toolbar-btn">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>

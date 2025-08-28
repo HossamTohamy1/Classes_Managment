@@ -1,0 +1,10 @@
+<!-- base-page.html -->
+<div class="page-container">
+  <!-- Navbar ثابت في أعلى كل صفحة -->
+  <app-navbar [pageTitle]="pageTitle"></app-navbar>
+  
+  <!-- المحتوى مع scroll منفصل -->
+  <div class="page-content">
+    <ng-content></ng-content>
+  </div>
+</div>
