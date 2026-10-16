@@ -40,3 +40,17 @@ testem.log
 .DS_Store
 Thumbs.db
 config.bat
+
+# --- cleanup ---
+.vscode/
+.vs/
+bin/
+obj/
+*.user
+node_modules/
+dist/
+dev-dist/
+.env
+.env.*
+!.env.example
+config.bat
