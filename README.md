@@ -1,59 +1,47 @@
-# SchoolTimetable
+# 🗓️ Classes Management — School Timetable Website
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.5.
+> A website where a school manages its classes and teachers and views the weekly timetable.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🧐 What is this, in plain words?
 
-```bash
-ng serve
-```
+This is the **screen side** of a school scheduling system — what the school staff open in the browser.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+From here they can:
 
-## Code scaffolding
+- 🏫 Manage **classes** (e.g. *Grade 2 – B*).
+- 🧑‍🏫 Manage **teachers**.
+- 🗓️ View and organize the **weekly timetable** in a clear grid, so everyone knows who teaches what and when.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 👥 Who uses it?
 
-```bash
-ng generate component component-name
-```
+| Who | What they can do |
+|---|---|
+| **School admin** | Add/edit classes and teachers, organize the timetable |
+| **Teachers / Staff** | View the timetable |
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🛠️ For developers
 
-## Building
+**Tech stack:** Angular 20 · TypeScript · Angular Material & CDK · Bootstrap 5 · Syncfusion navigation components · Deployed on Vercel
 
-To build the project run:
+**Main pages (`src/app/pages`):** `classes`, `teachers`, `timetable`
 
-```bash
-ng build
-```
+**Run locally**
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+1. Install [Node.js](https://nodejs.org/) (LTS) and the Angular CLI: `npm i -g @angular/cli`
+2. Copy `.env.example` to `.env` and set `AUTH_API_KEY`.
+3. Run:
+   ```bash
+   npm install
+   npm start
+   ```
+4. Open `http://localhost:4200/`.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 🇪🇬 بالعربي
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+موقع لإدارة المدرسة من ناحية الشاشات: بيعرض الفصول والمدرسين، وجدول الحصص الأسبوعي في شكل جدول واضح، فكل واحد يعرف مين بيدرّس إيه وإمتى.
